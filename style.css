@@ -96,6 +96,7 @@ header h1 {
     border: 1px solid darkgrey;
     border-radius: 10px;
     box-shadow: inset 0px 0px 5px;
+    background-color: rgb(204, 204, 182);
 }
 
 #five-day-forecast {
@@ -104,6 +105,10 @@ header h1 {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
+}
+
+#five-day-forecast h3 {
+    width: 100%;
 }
 
 .width20 {

@@ -29,7 +29,6 @@ header {
     align-items: center;
     width: 100%;
     background: linear-gradient(135deg, rgb(75, 5, 75), rgb(19, 113, 253));
-    /* background-color: rgb(75, 5, 75); */
     padding: 15px;
 }
 

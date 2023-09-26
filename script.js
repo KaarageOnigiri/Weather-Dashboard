@@ -62,8 +62,8 @@ function init() {
         })
     }
     else {
-        // display lastest search, but first, change to fetch link
-        fetch("https://api.openweathermap.org/data/2.5/weather?q=ohio&appid=0c4a0f7b9dff27d58bfb79aaa0d50f4c&units=metric")
+        // display lastest search
+        fetch("https://api.openweathermap.org/data/2.5/weather?q=" + previousUserInput[0] + "&appid=0c4a0f7b9dff27d58bfb79aaa0d50f4c&units=metric")
         .then(function(response) {
             if (response.ok) {
                 response.json().then(function(data) {
@@ -76,8 +76,7 @@ function init() {
                 alert("Error: " + response.status);
             }
         })
-        // change the fetch link
-        fetch("https://api.openweathermap.org/data/2.5/forecast?q=ohio&appid=0c4a0f7b9dff27d58bfb79aaa0d50f4c&units=metric")
+        fetch("https://api.openweathermap.org/data/2.5/forecast?q=" + previousUserInput[0] + "&appid=0c4a0f7b9dff27d58bfb79aaa0d50f4c&units=metric")
         .then(function(response) {
             if (response.ok) {
                 response.json().then(function(data) {
@@ -125,10 +124,7 @@ function displayCurrentWeather(data) {
     cityEl.textContent = data.name + ": " + dayjs().format("MMM D, YYYY");
     var weatherIcon = document.createElement("img");
     weatherIcon.src = weatherIconUrl1 + data.weather[0].icon + weatherIconUrl2;
-
     iconEl.src = weatherIconUrl1 + data.weather[0].icon + weatherIconUrl2;
-
-    console.log(weatherIcon.src);
     tempEl.textContent = "Temp: " + Math.round(data.main.temp) + "°C";
     windEl.textContent = "Wind: " + data.wind.speed + " km/h";
     humidityEl.textContent = "Humidity: " + data.main.humidity + "%";
@@ -136,12 +132,9 @@ function displayCurrentWeather(data) {
 }
 
 function displayFutureWeather(data) {
-    console.log(data);
-    console.log();
     console.log(parseInt(dayjs().format("D")), parseInt(data.list[0].dt_txt.split(" ")[0].split("-")[2]));
 
     for (x = 0, y = 0; x < 40; x += 8, y++) {
-        console.log(dayAfterDateEl[0]);
         dayAfterDateEl[y].textContent = data.list[x].dt_txt.split(" ")[0];
         dayAfterIconEl[y].src = weatherIconUrl1 + data.list[x].weather[0].icon + weatherIconUrl2;
         dayAfterTempEl[y].textContent = "Temp: " + Math.round(data.list[x].main.temp) + "°C";
@@ -151,16 +144,12 @@ function displayFutureWeather(data) {
 }
 
 function historyTab(userInput) {
-    console.log("history tab");
     previousUserInput.unshift(userInput);
     localStorage.setItem("previousUserInput", JSON.stringify(previousUserInput));
     displayHistory();
 }
 
 function displayHistory() {
-    console.log("displayHistory");
-    console.log(searchHistoryEl.children.length >= 5);
-
     for(x = 0; x < 5; x++) {
         var searchLists = document.createElement("li");
         searchLists.textContent = previousUserInput[x];
@@ -179,8 +168,6 @@ function displayHistory() {
 
 function findPreviousWeather(event) {
     var userClick = event.target.getAttribute("data");
-
-    console.log(event.target, userClick);
     
     fetch(apiUrl + userClick + "&appid=" + apiKey + "&units=metric")
     .then(function(response) {

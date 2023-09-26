@@ -37,7 +37,6 @@ header h1 {
     color: white;
 }
 
-/* for later when creating elements (history) */
 .search-history {
     width: 100%;
     text-align: center;
@@ -48,6 +47,7 @@ header h1 {
     list-style: none;
 }
 
+/* for later when creating elements (history) */
 .search-history-list {
     margin-top: 5%;
     background-color:rgb(97, 7, 97);
@@ -138,3 +138,33 @@ header h1 {
     box-shadow: 1px 1px 12px grey;
 }
 
+@media screen and (max-width: 576px) {
+    body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: rgb(209, 209, 186);
+    }
+    #search-bar {
+        /* 25% width */
+        padding: 10%; 
+        width: 90%;
+        display: flex;
+        flex-direction: column;
+    }
+    #five-day-forecast {
+        margin: 10px 3%;
+        padding: 10px 20px;
+        display: flex;
+        flex-direction: column;
+    }
+    .width20 {
+        width: 94%;
+        margin: 2%;
+        margin-bottom: 2%;
+        min-width: 140px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+}

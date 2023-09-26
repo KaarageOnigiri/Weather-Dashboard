@@ -95,7 +95,7 @@ header h1 {
     margin-right: 2%;
     border: 1px solid darkgrey;
     border-radius: 10px;
-    box-shadow: inset 0px 0px 5px;
+    box-shadow: inset 0px 0px 10px rgb(104, 104, 104);
     background-color: rgb(204, 204, 182);
 }
 
@@ -114,4 +114,13 @@ header h1 {
 .width20 {
     width: 18%;
     margin-right: 2%;
+    margin-bottom: 2%;
+    min-width: 140px;
+}
+
+#day-after-1, #day-after-2, #day-after-3, #day-after-4, #day-after-5 {
+    background-color: rgb(137, 228, 228);
+    padding: 1%;
+    border-radius: 10px;
+    box-shadow: 1px 1px 12px grey;
 }

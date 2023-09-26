@@ -31,54 +31,102 @@ var apiUrl2 = "https://api.openweathermap.org/data/2.5/forecast?q="
 var apiKey = "0c4a0f7b9dff27d58bfb79aaa0d50f4c";
 var weatherIconUrl1 = "https://openweathermap.org/img/wn/";
 var weatherIconUrl2 = "@2x.png";
+
 // "https://api.openweathermap.org/data/2.5/weather?q={city name}&appid={API key}"
 // https://openweathermap.org/weather-conditions  (icons)
 // units=metric
 
-// 1) check if the data.list[0] is the same as today's date, if not,
-//    run 0, 8, 16, 24, 32, if yes, run 8, 16, 24, 32, 40.
-// 2) Display the weather icons with src, don't need to fetch again.
+// -2) Display the weather icons with src, don't need to fetch again.
 // 3) Set up local storage, then search history bar.
 // 4) init function will call up local storage (optional) and then display 
-//    the latest successful search result.
+//    the latest successful search result in the form of search history bar.
+
+// all that's left is to do the local storage and history bar.
+
+var previousUserInput = JSON.parse(localStorage.getItem("previousUserInput"));
 
 function init() {
+    console.log(previousUserInput);
+    if (!previousUserInput) {
+        console.log("run");
+        fetch("https://api.openweathermap.org/data/2.5/weather?q=ohio&appid=0c4a0f7b9dff27d58bfb79aaa0d50f4c&units=metric")
+        .then(function(response) {
+            if (response.ok) {
+                response.json().then(function(data) {
+                    console.log(data);
+                    displayCurrentWeather(data);
+                })
+            }
+            else {
+                alert("Error: " + response.status);
+            }
+        })
     
-    console.log(dayjs().format("MMM D, YYYY"));
-    // this will be replaced by calling localstorage and display last saved
-    fetch("https://api.openweathermap.org/data/2.5/weather?q=ohio&appid=0c4a0f7b9dff27d58bfb79aaa0d50f4c&units=metric")
-    .then(function(response) {
-        if (response.ok) {
-            response.json().then(function(data) {
-                console.log(data);        
-            })
-        }
-        else {
-            alert("Error: " + response.status);
-        }
-    })
+        fetch("https://api.openweathermap.org/data/2.5/forecast?q=ohio&appid=0c4a0f7b9dff27d58bfb79aaa0d50f4c&units=metric")
+        .then(function(response) {
+            if (response.ok) {
+                response.json().then(function(data) {
+                    console.log(data);
+                    displayFutureWeather(data);
+                })
+            }
+        })
+    }
+    else {
+        // display lastest search, but first, change to fetch link
+        fetch("https://api.openweathermap.org/data/2.5/weather?q=ohio&appid=0c4a0f7b9dff27d58bfb79aaa0d50f4c&units=metric")
+        .then(function(response) {
+            if (response.ok) {
+                response.json().then(function(data) {
+                    console.log(data);
+                    displayCurrentWeather(data);
+                })
+            }
+            else {
+                alert("Error: " + response.status);
+            }
+        })
+        // change the fetch link
+        fetch("https://api.openweathermap.org/data/2.5/forecast?q=ohio&appid=0c4a0f7b9dff27d58bfb79aaa0d50f4c&units=metric")
+        .then(function(response) {
+            if (response.ok) {
+                response.json().then(function(data) {
+                    console.log(data);
+                    displayFutureWeather(data);
+                })
+            }
+        })
+    }
 
-    fetch("https://api.openweathermap.org/data/2.5/forecast?q=ohio&appid=0c4a0f7b9dff27d58bfb79aaa0d50f4c&units=metric")
-    .then(function(response) {
-        if (response.ok) {
-            response.json().then(function(data) {
-                console.log(data);
-                
-                for (x = 0; x < data.list.length; x+=8) {
-                    console.log(data.list[x]);
-                }
-                console.log(parseInt(dayjs().format("D")), parseInt(data.list[0].dt_txt.split(" ")[0].split("-")[2]));
-            })
-        }
-        else {
-            alert("Error: " + response.status);
-        }
-    })
+    
+    // console.log(dayjs().format("MMM D, YYYY"));
+
+    // fetch("https://api.openweathermap.org/data/2.5/weather?q=ohio&appid=0c4a0f7b9dff27d58bfb79aaa0d50f4c&units=metric")
+    // .then(function(response) {
+    //     if (response.ok) {
+    //         response.json().then(function(data) {
+    //             console.log(data);        
+    //         })
+    //     }
+    //     else {
+    //         alert("Error: " + response.status);
+    //     }
+    // })
+
+    // fetch("https://api.openweathermap.org/data/2.5/forecast?q=ohio&appid=0c4a0f7b9dff27d58bfb79aaa0d50f4c&units=metric")
+    // .then(function(response) {
+    //     if (response.ok) {
+    //         response.json().then(function(data) {
+    //             console.log(data);
+    //         })
+    //     }
+    // })
 }
 
 function findAPI() {
     var userInput = userInputEl.value;
     userInputEl.value = "";
+
     console.log(userInput);
     
     fetch(apiUrl + userInput + "&appid=" + apiKey + "&units=metric")
@@ -87,6 +135,10 @@ function findAPI() {
             response.json().then(function(data) {
                 console.log(data);
                 displayCurrentWeather(data);
+                // save to localStorage here (splice the userInput into the first array)
+                console.log(previousUserInput);
+                console.log(previousUserInput.unshift(userInput));
+                console.log(previousUserInput);
             })
         }
         else {
@@ -103,6 +155,7 @@ function findAPI() {
             })
         }
     })
+    historyTab();
 }
 
 function displayCurrentWeather(data) {
@@ -120,11 +173,36 @@ function displayCurrentWeather(data) {
 }
 
 function displayFutureWeather(data) {
-    console.log("displayFutureWeather");
-    
+    console.log(data);
+    console.log();
+    console.log(parseInt(dayjs().format("D")), parseInt(data.list[0].dt_txt.split(" ")[0].split("-")[2]));
+    // this is to make sure the first day of the future 5 days doesn't overlap with current day
+    for (x = 0, y = 0; x < 40; x += 8, y++) {
+        console.log(dayAfterDateEl[0]);
+        dayAfterDateEl[y].textContent = data.list[x].dt_txt.split(" ")[0];
+        dayAfterIconEl[y].src = weatherIconUrl1 + data.list[x].weather[0].icon + weatherIconUrl2;
+        dayAfterTempEl[y].textContent = "Temp: " + Math.round(data.list[x].main.temp) + "°C";
+        dayAfterWindEl[y].textContent = "Wind: " + data.list[x].wind.speed + " km/h";
+        dayAfterHumidityEl[y].textContent = "Humidity: " + data.list[x].main.humidity + "%";
+    }
 }
 
+// dayAfterEl[x] = document.getElementById("day-after-" + y);
+// dayAfterDateEl[x] = document.getElementById("day-after-" + y + "-date");
+// dayAfterIconEl[x] = document.getElementById("day-after-" + y + "-icon");
+// dayAfterTempEl[x] = document.getElementById("day-after-" + y + "-temp");
+// dayAfterWindEl[x] = document.getElementById("day-after-" + y + "-wind");
+// dayAfterHumidityEl[x] = document.getElementById("day-after-" + y + "-humidity");
 
+function historyTab() {
+    previousUserInput;
+    localStorage.setItem("previousUserInput", JSON.stringify(previousUserInput));
+}
+
+// previousQuizScores.splice(x, 0, timeLeft);
+// previousQuizParticipants.splice(x, 0, userInput.value);
+// localStorage.setItem("previousQuizParticipants", JSON.stringify(previousQuizParticipants));
+// localStorage.setItem("previousQuizHighScores", JSON.stringify(previousQuizScores));
 
 init();
 submitEl.addEventListener("click", findAPI);

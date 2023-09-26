@@ -45,8 +45,21 @@ header h1 {
     border-radius: 5px;
     background-color: lightgrey;
     padding: 3% 0;
-
     list-style: none;
+}
+
+.search-history-list {
+    margin-top: 5%;
+    background-color:rgb(97, 7, 97);
+    color: white;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    border-radius: 100px;
+}
+
+.search-history-list:hover {
+    cursor: pointer;
 }
 
 #search-bar {
@@ -124,3 +137,4 @@ header h1 {
     border-radius: 10px;
     box-shadow: 1px 1px 12px grey;
 }
+

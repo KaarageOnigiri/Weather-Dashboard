@@ -165,6 +165,7 @@ function displayHistory() {
         var searchLists = document.createElement("li");
         searchLists.textContent = previousUserInput[x];
         searchLists.setAttribute("data", previousUserInput[x]);
+        searchLists.setAttribute("class", "search-history-list");
         searchLists.addEventListener("click", findPreviousWeather);
         searchHistoryEl.appendChild(searchLists);
     }

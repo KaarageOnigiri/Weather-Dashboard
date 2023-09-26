@@ -1,6 +1,6 @@
 var userInputEl = document.getElementById("user-input");
 var submitEl = document.getElementById("submit");
-var seachHistoryEl = document.getElementById("search-history");
+var searchHistoryEl = document.getElementById("search-history");
 var searchResultEl = document.getElementById("search-result");
 var fiveDayForecastEl = document.getElementById("five-day-forecast");
 var cityEl = document.getElementById("city");
@@ -31,17 +31,6 @@ var apiUrl2 = "https://api.openweathermap.org/data/2.5/forecast?q="
 var apiKey = "0c4a0f7b9dff27d58bfb79aaa0d50f4c";
 var weatherIconUrl1 = "https://openweathermap.org/img/wn/";
 var weatherIconUrl2 = "@2x.png";
-
-// "https://api.openweathermap.org/data/2.5/weather?q={city name}&appid={API key}"
-// https://openweathermap.org/weather-conditions  (icons)
-// units=metric
-
-// -2) Display the weather icons with src, don't need to fetch again.
-// 3) Set up local storage, then search history bar.
-// 4) init function will call up local storage (optional) and then display 
-//    the latest successful search result in the form of search history bar.
-
-// all that's left is to do the local storage and history bar.
 
 var previousUserInput = JSON.parse(localStorage.getItem("previousUserInput"));
 
@@ -80,6 +69,7 @@ function init() {
                 response.json().then(function(data) {
                     console.log(data);
                     displayCurrentWeather(data);
+                    displayHistory();
                 })
             }
             else {
@@ -97,30 +87,6 @@ function init() {
             }
         })
     }
-
-    
-    // console.log(dayjs().format("MMM D, YYYY"));
-
-    // fetch("https://api.openweathermap.org/data/2.5/weather?q=ohio&appid=0c4a0f7b9dff27d58bfb79aaa0d50f4c&units=metric")
-    // .then(function(response) {
-    //     if (response.ok) {
-    //         response.json().then(function(data) {
-    //             console.log(data);        
-    //         })
-    //     }
-    //     else {
-    //         alert("Error: " + response.status);
-    //     }
-    // })
-
-    // fetch("https://api.openweathermap.org/data/2.5/forecast?q=ohio&appid=0c4a0f7b9dff27d58bfb79aaa0d50f4c&units=metric")
-    // .then(function(response) {
-    //     if (response.ok) {
-    //         response.json().then(function(data) {
-    //             console.log(data);
-    //         })
-    //     }
-    // })
 }
 
 function findAPI() {
@@ -135,10 +101,8 @@ function findAPI() {
             response.json().then(function(data) {
                 console.log(data);
                 displayCurrentWeather(data);
-                // save to localStorage here (splice the userInput into the first array)
-                console.log(previousUserInput);
-                console.log(previousUserInput.unshift(userInput));
-                console.log(previousUserInput);
+                // save to localStorage here (unshift the userInput into the first array)
+                historyTab(userInput);
             })
         }
         else {
@@ -155,11 +119,10 @@ function findAPI() {
             })
         }
     })
-    historyTab();
 }
 
 function displayCurrentWeather(data) {
-    cityEl.textContent = data.name + " " + dayjs().format("MMM D, YYYY");
+    cityEl.textContent = data.name + ": " + dayjs().format("MMM D, YYYY");
     var weatherIcon = document.createElement("img");
     weatherIcon.src = weatherIconUrl1 + data.weather[0].icon + weatherIconUrl2;
 
@@ -176,7 +139,7 @@ function displayFutureWeather(data) {
     console.log(data);
     console.log();
     console.log(parseInt(dayjs().format("D")), parseInt(data.list[0].dt_txt.split(" ")[0].split("-")[2]));
-    // this is to make sure the first day of the future 5 days doesn't overlap with current day
+
     for (x = 0, y = 0; x < 40; x += 8, y++) {
         console.log(dayAfterDateEl[0]);
         dayAfterDateEl[y].textContent = data.list[x].dt_txt.split(" ")[0];
@@ -187,22 +150,61 @@ function displayFutureWeather(data) {
     }
 }
 
-// dayAfterEl[x] = document.getElementById("day-after-" + y);
-// dayAfterDateEl[x] = document.getElementById("day-after-" + y + "-date");
-// dayAfterIconEl[x] = document.getElementById("day-after-" + y + "-icon");
-// dayAfterTempEl[x] = document.getElementById("day-after-" + y + "-temp");
-// dayAfterWindEl[x] = document.getElementById("day-after-" + y + "-wind");
-// dayAfterHumidityEl[x] = document.getElementById("day-after-" + y + "-humidity");
-
-function historyTab() {
-    previousUserInput;
+function historyTab(userInput) {
+    console.log("history tab");
+    previousUserInput.unshift(userInput);
     localStorage.setItem("previousUserInput", JSON.stringify(previousUserInput));
+    displayHistory();
 }
 
-// previousQuizScores.splice(x, 0, timeLeft);
-// previousQuizParticipants.splice(x, 0, userInput.value);
-// localStorage.setItem("previousQuizParticipants", JSON.stringify(previousQuizParticipants));
-// localStorage.setItem("previousQuizHighScores", JSON.stringify(previousQuizScores));
+function displayHistory() {
+    console.log("displayHistory");
+    console.log(searchHistoryEl.children.length >= 5);
+
+    for(x = 0; x < 5; x++) {
+        var searchLists = document.createElement("li");
+        searchLists.textContent = previousUserInput[x];
+        searchLists.setAttribute("data", previousUserInput[x]);
+        searchLists.addEventListener("click", findPreviousWeather);
+        searchHistoryEl.appendChild(searchLists);
+    }
+
+    if (searchHistoryEl.children.length >= 10) {
+        for(x = 4; x >= 0; x--) {
+            searchHistoryEl.children[x].remove();
+        }
+    }
+}
+
+function findPreviousWeather(event) {
+    var userClick = event.target.getAttribute("data");
+
+    console.log(event.target, userClick);
+    
+    fetch(apiUrl + userClick + "&appid=" + apiKey + "&units=metric")
+    .then(function(response) {
+        if (response.ok) {
+            response.json().then(function(data) {
+                console.log(data);
+                displayCurrentWeather(data);
+                historyTab(userClick);
+            })
+        }
+        else {
+            alert("Error: " + response.status);
+        }
+    })
+
+    fetch(apiUrl2 + userClick + "&appid=" + apiKey + "&units=metric")
+    .then(function(response) {
+        if (response.ok) {
+            response.json().then(function(data) {
+                console.log(data);
+                displayFutureWeather(data);
+            })
+        }
+    })
+}
 
 init();
 submitEl.addEventListener("click", findAPI);

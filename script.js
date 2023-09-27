@@ -37,13 +37,15 @@ var previousUserInput = JSON.parse(localStorage.getItem("previousUserInput"));
 function init() {
     console.log(previousUserInput);
     if (!previousUserInput) {
-        console.log("run");
+        console.log(!previousUserInput);
         fetch("https://api.openweathermap.org/data/2.5/weather?q=ohio&appid=0c4a0f7b9dff27d58bfb79aaa0d50f4c&units=metric")
         .then(function(response) {
             if (response.ok) {
                 response.json().then(function(data) {
                     console.log(data);
                     displayCurrentWeather(data);
+                    previousUserInput = [" "];
+                    localStorage.setItem("previousUserInput", JSON.stringify(previousUserInput));
                 })
             }
             else {
